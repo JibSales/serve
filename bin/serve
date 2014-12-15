@@ -21,12 +21,9 @@ program
   .usage('[options] [dir]')
   .option('-F, --format <fmt>', 'specify the log format string', 'dev')
   .option('-p, --port <port>', 'specify the port [3000]', Number, 3000)
-  .option('-H, --hidden', 'enable hidden file serving')
-  .option('-I, --no-icons', 'disable icons')
   .option('-L, --no-logs', 'disable request logging')
-  .option('-D, --no-dirs', 'disable directory serving')
   .option('-R, --livereload', 'inject livereload script to response')
-  .option('-P, --pushstate <index>', 'enable HTML5 pushstate support')
+  .option('-P, --pushstate <route>', 'enable HTML5 pushstate support')
   .parse(process.argv);
 
 // Set the path. Defaults to current directory
@@ -35,7 +32,7 @@ var path = resolve(program.args.shift() || '.');
 // Create the server
 var server = express();
 
-// ignore favicon
+// favicon
 var ico = join(path, 'public/favicon.ico')
 if (fs.existsSync(ico)) {
   server.use(favicon(ico));  
@@ -50,7 +47,7 @@ if (program.livereload) server.use(livereload());
 // static files
 server.use(express.static(path, { hidden: program.hidden }));
 
-// -- Handle HTML5 PushState Routes
+// handle HTML5 PushState
 if (program.pushstate) {
   server.route('*')
     .get(function (req, res) {
