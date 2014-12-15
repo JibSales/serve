@@ -2,6 +2,7 @@
 
 // Load Modules
 var join = require('path').join;
+var resolve = require('path').resolve;
 var fs = require('fs');
 var program = require('commander');
 var express = require('express');
