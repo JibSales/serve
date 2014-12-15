@@ -1,0 +1,25 @@
+{
+  "name": "serve",
+  "version": "0.1.0",
+  "author": "Sean R. Quinn <sean@jibsales.com>",
+  "description": "A simple http server with HTML5 Pushstate support",
+  "bin": {
+    "serve": "./bin/serve"
+  },
+  "private": true,
+  "preferGlobal": true,
+  "dependencies": {
+    "commander": "^2.5.0",
+    "connect-livereload": "^0.5.2",
+    "express": "^4.10.6",
+    "morgan": "^1.5.0",
+    "serve-favicon": "^2.1.7",
+    "serve-index": "^1.5.3",
+    "serve-static": "^1.7.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jibsales/serve"
+  },
+  "homepage": "https://github.com/jibsales/serve"
+}
