@@ -2,6 +2,7 @@
 
 // Load Modules
 var join = require('path').join;
+var resolve = require('path').resolve;
 var fs = require('fs');
 var program = require('commander');
 var express = require('express');
@@ -19,7 +20,7 @@ program
   .option('-p, --port <port>', 'specify the port [3000]', Number, 3000)
   .option('-L, --no-logs', 'disable request logging')
   .option('-R, --livereload', 'inject livereload script to response')
-  .option('-P, --pushstate <route>', 'enable HTML5 pushstate support')
+  .option('-P, --pushstate <path>', 'enable HTML5 pushstate support with path to index.html file')
   .parse(process.argv);
 
 // Set the path. Defaults to current directory
@@ -41,7 +42,7 @@ if (program.logs) server.use(logger(program.format));
 if (program.livereload) server.use(livereload());
 
 // static files
-server.use(express.static(path, { hidden: program.hidden }));
+server.use(express.static(path));
 
 // handle HTML5 PushState
 if (program.pushstate) {
@@ -55,4 +56,3 @@ if (program.pushstate) {
 server.listen(program.port, function () {
   console.log('\033[90m\nServing \033[36m%s\033[90m on port \033[0m\033[35m%d\033[0m\n', path, program.port);
 });
-
