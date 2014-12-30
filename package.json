@@ -1,6 +1,6 @@
 {
   "name": "serve",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Sean R. Quinn <sean@jibsales.com>",
   "description": "A simple http server with HTML5 Pushstate support",
   "bin": {
