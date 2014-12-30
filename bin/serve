@@ -5,12 +5,15 @@ var join = require('path').join;
 var resolve = require('path').resolve;
 var fs = require('fs');
 var program = require('commander');
-var express = require('express');
+var connect = require('connect');
 
 // Load Middleware
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var livereload = require('connect-livereload');
+var modRewrite = require('connect-modrewrite');
+var compression = require('compression');
+var static = require('serve-static');
 
 // CLI
 program
@@ -20,20 +23,22 @@ program
   .option('-p, --port <port>', 'specify the port [3000]', Number, 3000)
   .option('-L, --no-logs', 'disable request logging')
   .option('-R, --livereload', 'inject livereload script to response')
-  .option('-P, --pushstate <path>', 'enable HTML5 pushstate support with path to index.html file')
+  .option('-P, --pushstate', 'enable HTML5 pushstate support')
   .parse(process.argv);
 
-// Set the path. Defaults to current directory
-var path = resolve(program.args.shift() || '.');
+// Set the array of directories to serve
+var paths = program.args.length === 0 ? ['.'] : program.args;
 
 // Create the server
-var server = express();
+var server = connect();
 
 // favicon
-var ico = join(path, 'public/favicon.ico')
-if (fs.existsSync(ico)) {
-  server.use(favicon(ico));  
-}
+paths.forEach(function (path) {
+  var ico = join(path, 'favicon.ico');
+  if (fs.existsSync(ico)) {
+    server.use(favicon(ico));  
+  }
+});
 
 // logger
 if (program.logs) server.use(logger(program.format));
@@ -41,18 +46,26 @@ if (program.logs) server.use(logger(program.format));
 // livereload
 if (program.livereload) server.use(livereload());
 
-// static files
-server.use(express.static(path));
-
 // handle HTML5 PushState
 if (program.pushstate) {
-  server.route('*')
-    .get(function (req, res) {
-      res.sendFile(join(path, program.pushstate, 'index.html'));
-    });
+  server.use(modRewrite([
+    '!\\.html|\\.js|\\.json|\\.csv|\\.css|\\.png|\\.svg|\\.eot|\\.ttf|\\.woff|\\.appcache|\\.jpg|\\.jpeg|\\.gif /index.html [L]'
+  ]));
 }
+
+// compress files
+server.use(compression());
+
+// serve multiple static file directories
+paths.forEach(function (path) {
+  server.use(static(path));  
+});
 
 // start the server
 server.listen(program.port, function () {
-  console.log('\033[90m\nServing \033[36m%s\033[90m on port \033[0m\033[35m%d\033[0m\n', path, program.port);
+  console.log('\033[90m\nServing \033[36m%s\033[90m on port \033[35m%d\033[0m\n', paths.join('\033[90m and \033[36m'), program.port);
 });
+
+
+
+
