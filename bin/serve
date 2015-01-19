@@ -23,7 +23,7 @@ program
   .option('-p, --port <port>', 'specify the port [3000]', Number, 3000)
   .option('-L, --no-logs', 'disable request logging')
   .option('-R, --livereload', 'inject livereload script to response')
-  .option('-P, --pushstate', 'enable HTML5 pushstate support')
+  .option('-P, --pushstate [prefix]', 'enable HTML5 pushstate support', '/')
   .parse(process.argv);
 
 // Set the array of directories to serve
@@ -43,18 +43,19 @@ paths.forEach(function (path) {
 // logger
 if (program.logs) server.use(logger(program.format));
 
-// livereload
-if (program.livereload) server.use(livereload());
-
 // handle HTML5 PushState
 if (program.pushstate) {
-  server.use(modRewrite([
-    '!\\.html|\\.js|\\.json|\\.csv|\\.css|\\.png|\\.svg|\\.eot|\\.ttf|\\.woff|\\.appcache|\\.jpg|\\.jpeg|\\.gif /index.html [L]'
-  ]));
+  var withPrefix = ['^' + program.pushstate + '/(.*)$ ' + program.pushstate + '/index.html [L]']
+  var root = ['!\\.html|\\.js|\\.json|\\.csv|\\.css|\\.png|\\.svg|\\.eot|\\.ttf|\\.woff|\\.appcache|\\.jpg|\\.jpeg|\\.gif /index.html [L]'];
+  var rules = program.pushstate === '/' ? root : withPrefix;
+  server.use(modRewrite(rules));
 }
 
 // compress files
-server.use(compression());
+// server.use(compression());
+
+// livereload
+if (program.livereload) server.use(livereload());
 
 // serve multiple static file directories
 paths.forEach(function (path) {
